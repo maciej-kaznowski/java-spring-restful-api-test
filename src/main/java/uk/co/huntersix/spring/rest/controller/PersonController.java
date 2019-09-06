@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.PersonDataService;
 
+import java.util.List;
+
 @RestController
 public class PersonController {
     private PersonDataService personDataService;
@@ -27,5 +29,10 @@ public class PersonController {
         } else {
             return new ResponseEntity<>(person, HttpStatus.OK);
         }
+    }
+
+    @GetMapping("/person/{lastName}")
+    public List<Person> people(@PathVariable(value = "lastName") String lastName) {
+        return personDataService.findPeople(lastName);
     }
 }

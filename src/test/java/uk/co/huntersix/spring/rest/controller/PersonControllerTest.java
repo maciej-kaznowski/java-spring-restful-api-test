@@ -10,6 +10,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.PersonDataService;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -44,5 +48,46 @@ public class PersonControllerTest {
         this.mockMvc.perform(get("/person/fullName/firstName"))
             .andDo(print())
             .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void shouldReturnPeopleFromService() throws Exception {
+        when(personDataService.findPeople(any())).thenReturn(Arrays.asList(
+            new Person("Mary", "Smith"),
+            new Person("Adam", "Smith")
+        ));
+        this.mockMvc.perform(get("/person/smith"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$", hasSize(2)))
+            .andExpect(jsonPath("$[0].firstName").value("Mary"))
+            .andExpect(jsonPath("$[0].lastName").value("Smith"))
+            .andExpect(jsonPath("$[1].firstName").value("Adam"))
+            .andExpect(jsonPath("$[1].lastName").value("Smith"));
+    }
+
+    @Test
+    public void shouldReturnEmptyArrayForNoPeople() throws Exception {
+        when(personDataService.findPeople(any())).thenReturn(Collections.emptyList());
+
+        this.mockMvc.perform(get("/person/smith"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    public void shouldReturnArrayForSinglePerson() throws Exception {
+        when(personDataService.findPeople(any())).thenReturn(Collections.singletonList(new Person("Mary", "Smith")));
+
+        this.mockMvc.perform(get("/person/smith"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$").isArray())
+            .andExpect(jsonPath("$", hasSize(1)))
+            .andExpect(jsonPath("$[0].firstName").value("Mary"))
+            .andExpect(jsonPath("$[0].lastName").value("Smith"));
     }
 }

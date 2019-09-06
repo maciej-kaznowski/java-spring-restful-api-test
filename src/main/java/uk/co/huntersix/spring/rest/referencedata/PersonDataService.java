@@ -23,4 +23,16 @@ public class PersonDataService {
         if (peopleForGivenName.isEmpty()) return null;
         return peopleForGivenName.get(0);
     }
+
+    /**
+     * Finds all people with the given last name.
+     *
+     * @param lastName the last name of {@link Person} we are looking for, case-insensitive
+     * @return a list of {@link Person} with the given lastName
+     */
+    public List<Person> findPeople(String lastName) {
+        return PERSON_DATA.stream()
+            .filter(person -> person.getLastName().equalsIgnoreCase(lastName))
+            .collect(Collectors.toList());
+    }
 }
