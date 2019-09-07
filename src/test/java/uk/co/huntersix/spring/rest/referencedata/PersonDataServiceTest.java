@@ -3,7 +3,7 @@ package uk.co.huntersix.spring.rest.referencedata;
 import org.junit.Test;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.PersonDataService.PersonAlreadyExistsException;
-import uk.co.huntersix.spring.rest.referencedata.PersonDataService.PersonDoesNotExistException;
+import uk.co.huntersix.spring.rest.referencedata.PersonDataService.PersonNotFoundException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +28,7 @@ public class PersonDataServiceTest {
         assertEquals("Smith", person.getLastName());
     }
 
-    @Test(expected = PersonDoesNotExistException.class)
+    @Test(expected = PersonNotFoundException.class)
     public void findPerson_shouldThrowForNoMatchingPeople() {
         service.findPerson("Snow", "Jon");
     }
@@ -59,7 +59,7 @@ public class PersonDataServiceTest {
         try {
             service.findPerson("Snow", "Jon");
             fail();
-        } catch (PersonDoesNotExistException ignored) {
+        } catch (PersonNotFoundException ignored) {
         }
 
         Person jonSnow = new Person("Jon", "Snow");

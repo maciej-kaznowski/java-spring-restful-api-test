@@ -26,7 +26,7 @@ public class PersonDataService {
             .collect(Collectors.toList());
 
         if (peopleForGivenName.isEmpty()) {
-            throw new PersonDoesNotExistException();
+            throw new PersonNotFoundException();
         }
 
         return peopleForGivenName.get(0);
@@ -61,11 +61,11 @@ public class PersonDataService {
             .anyMatch(person -> person.getFirstName().equalsIgnoreCase(firstName) && person.getLastName().equalsIgnoreCase(lastName));
     }
 
-    @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Person does not exist")
-    public static class PersonDoesNotExistException extends RuntimeException {
+    @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Person not found")
+    public static class PersonNotFoundException extends RuntimeException {
 
-        PersonDoesNotExistException() {
-            super("Person does not exist");
+        PersonNotFoundException() {
+            super("Person not found");
         }
     }
 
