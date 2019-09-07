@@ -1,8 +1,6 @@
 package uk.co.huntersix.spring.rest.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.PersonDataService;
@@ -18,15 +16,9 @@ public class PersonController {
     }
 
     @GetMapping("/person/{lastName}/{firstName}")
-    public ResponseEntity<Person> person(@PathVariable(value = "lastName") String lastName,
-                                         @PathVariable(value = "firstName") String firstName) {
-        Person person = personDataService.findPerson(lastName, firstName);
-
-        if (person == null) {
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(person, HttpStatus.OK);
-        }
+    public Person person(@PathVariable(value = "lastName") String lastName,
+                         @PathVariable(value = "firstName") String firstName) {
+        return personDataService.findPerson(lastName, firstName);
     }
 
     @GetMapping("/person/{lastName}")

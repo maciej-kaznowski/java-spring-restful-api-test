@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.PersonDataService;
 import uk.co.huntersix.spring.rest.referencedata.PersonDataService.PersonAlreadyExistsException;
+import uk.co.huntersix.spring.rest.referencedata.PersonDataService.PersonDoesNotExistException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class PersonControllerTest {
 
     @Test
     public void shouldReturnNoContentWhenPersonNotFound() throws Exception {
-        when(personDataService.findPerson(any(), any())).thenReturn(null);
+        when(personDataService.findPerson(any(), any())).thenThrow(PersonDoesNotExistException.class);
         this.mockMvc.perform(get("/person/fullName/firstName"))
             .andDo(print())
             .andExpect(status().isNoContent());

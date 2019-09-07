@@ -25,7 +25,10 @@ public class PersonDataService {
             .filter(p -> p.getFirstName().equalsIgnoreCase(firstName) && p.getLastName().equalsIgnoreCase(lastName))
             .collect(Collectors.toList());
 
-        if (peopleForGivenName.isEmpty()) return null;
+        if (peopleForGivenName.isEmpty()) {
+            throw new PersonDoesNotExistException();
+        }
+
         return peopleForGivenName.get(0);
     }
 
@@ -58,9 +61,17 @@ public class PersonDataService {
             .anyMatch(person -> person.getFirstName().equalsIgnoreCase(firstName) && person.getLastName().equalsIgnoreCase(lastName));
     }
 
+    @ResponseStatus(value = HttpStatus.NO_CONTENT, reason = "Person does not exist")
+    public static class PersonDoesNotExistException extends RuntimeException {
+
+        PersonDoesNotExistException() {
+            super("Person does not exist");
+        }
+    }
+
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Person already exists")
     public static class PersonAlreadyExistsException extends RuntimeException {
-        
+
         PersonAlreadyExistsException() {
             super("Person already exists");
         }
