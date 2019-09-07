@@ -1,25 +1,28 @@
 package uk.co.huntersix.spring.rest.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.co.huntersix.spring.rest.model.Person;
 import uk.co.huntersix.spring.rest.referencedata.PersonDataService;
+import uk.co.huntersix.spring.rest.referencedata.PersonDataService.PersonAlreadyExistsException;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(PersonController.class)
@@ -89,5 +92,31 @@ public class PersonControllerTest {
             .andExpect(jsonPath("$", hasSize(1)))
             .andExpect(jsonPath("$[0].firstName").value("Mary"))
             .andExpect(jsonPath("$[0].lastName").value("Smith"));
+    }
+
+    @Test
+    public void shouldCreateNewPerson() throws Exception {
+        Person jonSnow = new Person("Jon", "Snow");
+        String jsonBody = new ObjectMapper().writeValueAsString(jonSnow);
+
+        this.mockMvc.perform(post("/person").contentType(MediaType.APPLICATION_JSON_UTF8).content(jsonBody))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().json(jsonBody));
+
+        verify(personDataService, times(1)).addPerson(any());
+    }
+
+    @Test
+    public void shouldReturnErrorWhenPersonExists() throws Exception {
+        Person jonSnow = new Person("Jon", "Snow");
+        String jsonBody = new ObjectMapper().writeValueAsString(jonSnow);
+
+        doThrow(PersonAlreadyExistsException.class).when(personDataService).addPerson(any());
+
+        this.mockMvc.perform(post("/person").contentType(MediaType.APPLICATION_JSON_UTF8).content(jsonBody))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(status().reason("Person already exists"));
     }
 }
