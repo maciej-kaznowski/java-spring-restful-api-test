@@ -51,7 +51,8 @@ public class PersonControllerTest {
         when(personDataService.findPerson(any(), any())).thenThrow(PersonDoesNotExistException.class);
         this.mockMvc.perform(get("/person/fullName/firstName"))
             .andDo(print())
-            .andExpect(status().isNoContent());
+            .andExpect(status().isNoContent())
+            .andExpect(status().reason("Person does not exist"));
     }
 
     @Test
