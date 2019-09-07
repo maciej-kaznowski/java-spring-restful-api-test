@@ -30,8 +30,7 @@ public class PersonDataServiceTest {
 
     @Test(expected = PersonDoesNotExistException.class)
     public void findPerson_shouldThrowForNoMatchingPeople() {
-        Person person = service.findPerson("Snow", "Jon");
-        assertNull(person);
+        service.findPerson("Snow", "Jon");
     }
 
     @Test
